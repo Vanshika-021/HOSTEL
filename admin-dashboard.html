@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Hostel Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9; /* slate-100 */
+        }
+        .stat-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+        .request-card, .allotted-card {
+            transition: box-shadow 0.2s ease;
+        }
+        .request-card:hover, .allotted-card:hover {
+             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        /* Custom scrollbar for better aesthetics */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9; /* slate-100 */
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #94a3b8; /* slate-400 */
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #64748b; /* slate-500 */
+        }
+        /* Styles for active sidebar link */
+        .sidebar-link.active {
+            background-color: #e2e8f0; /* slate-200 */
+            color: #1e293b; /* slate-800 */
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="antialiased text-slate-800">
+
+    <div class="relative min-h-screen lg:flex">
+        <aside id="sidebar" class="fixed inset-y-0 left-0 z-30 w-64 bg-white border-r border-slate-200 flex flex-col transform -translate-x-full lg:relative lg:translate-x-0 lg:flex-shrink-0 transition-transform duration-300 ease-in-out">
+            <div class="h-16 flex items-center justify-center border-b border-slate-200 flex-shrink-0">
+                <h1 class="text-xl font-bold text-slate-800"><i class="fas fa-shield-halved mr-2"></i>Admin Panel</h1>
+            </div>
+            <nav id="sidebar-nav" class="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+                <a href="#" data-view="dashboard-view" class="sidebar-link flex items-center px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg">
+                    <i class="fas fa-tachometer-alt w-6 h-6 mr-3"></i>
+                    Dashboard
+                </a>
+                <a href="#" data-view="room-management-view" class="sidebar-link flex items-center px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg">
+                    <i class="fas fa-bed w-6 h-6 mr-3"></i>
+                    Room Management
+                </a>
+                <a href="#" data-view="students-view" class="sidebar-link flex items-center px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg">
+                    <i class="fas fa-users w-6 h-6 mr-3"></i>
+                    Students
+                </a>
+            </nav>
+            <div class="p-4 border-t border-slate-200">
+                 <a href="#" class="flex items-center px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg">
+                    <i class="fas fa-sign-out-alt w-6 h-6 mr-3"></i>
+                    Logout
+                </a>
+            </div>
+        </aside>
+
+        <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-20 hidden lg:hidden"></div>
+
+        <main class="flex-1 p-6 md:p-8 overflow-y-auto">
+             <header class="mb-8 flex justify-between items-center">
+                <div>
+                    <h1 id="main-header-title" class="text-2xl lg:text-3xl font-bold text-slate-900">Hostel Dashboard</h1>
+                    <p class="text-slate-500 mt-1">July 30, 2025 - Jaipur, Rajasthan</p>
+                </div>
+                 <button id="menu-toggle-btn" class="lg:hidden p-2 rounded-md text-slate-600 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500">
+                    <i class="fas fa-bars fa-lg"></i>
+                </button>
+            </header>
+
+            <div id="dashboard-view">
+                <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                    <div class="stat-card bg-white p-6 rounded-xl border border-slate-200 flex items-center">
+                        <div class="p-4 bg-green-100 rounded-full mr-4">
+                            <i class="fas fa-door-open fa-2x text-green-600"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-slate-500 font-medium">Available Rooms</h3>
+                            <p id="available-rooms-stat" class="text-3xl font-bold text-slate-800">0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card bg-white p-6 rounded-xl border border-slate-200 flex items-center">
+                        <div class="p-4 bg-amber-100 rounded-full mr-4">
+                            <i class="fas fa-hourglass-half fa-2x text-amber-600"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-slate-500 font-medium">Pending Requests</h3>
+                            <p id="pending-requests-stat" class="text-3xl font-bold text-slate-800">0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card bg-white p-6 rounded-xl border border-slate-200 flex items-center">
+                        <div class="p-4 bg-blue-100 rounded-full mr-4">
+                            <i class="fas fa-bed fa-2x text-blue-600"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-slate-500 font-medium">Occupied Rooms</h3>
+                            <p id="occupied-rooms-stat" class="text-3xl font-bold text-slate-800">0</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 flex flex-col">
+                        <h2 class="text-xl font-bold text-slate-800 mb-4">Booking Requests</h2>
+                        <div id="booking-requests-list" class="space-y-4 overflow-y-auto custom-scrollbar flex-1 pr-2" style="max-height: 400px;">
+                            <p id="no-requests-msg" class="text-slate-500 text-center py-8">No pending requests.</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 flex flex-col">
+                        <h2 class="text-xl font-bold text-slate-800 mb-4">Allotted Rooms</h2>
+                        <div id="allotted-rooms-list" class="space-y-4 overflow-y-auto custom-scrollbar flex-1 pr-2" style="max-height: 400px;">
+                             <p id="no-allotted-msg" class="text-slate-500 text-center py-8">No rooms allotted yet.</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <div id="students-view" class="hidden">
+                 <section class="bg-white p-6 rounded-xl border border-slate-200">
+                    <h2 class="text-xl font-bold text-slate-800 mb-4">Student Directory</h2>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-slate-200">
+                            <thead class="bg-slate-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Student Name</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Student ID</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Room Number</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Room Type</th>
+                                </tr>
+                            </thead>
+                            <tbody id="students-table-body" class="bg-white divide-y divide-slate-200">
+                                </tbody>
+                        </table>
+                         <p id="no-students-msg" class="hidden text-slate-500 text-center py-8">No students have been allotted rooms yet.</p>
+                    </div>
+                </section>
+            </div>
+            
+            <div id="room-management-view" class="hidden">
+                <section class="bg-white p-6 rounded-xl border border-slate-200">
+                    <h2 class="text-xl font-bold text-slate-800 mb-4">Room Management</h2>
+                    <p class="text-slate-500">This section is under construction. Full room management features will be available soon.</p>
+                </section>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // --- DOM Elements ---
+            const bookingRequestsList = document.getElementById('booking-requests-list');
+            const allottedRoomsList = document.getElementById('allotted-rooms-list');
+            const availableRoomsStat = document.getElementById('available-rooms-stat');
+            const pendingRequestsStat = document.getElementById('pending-requests-stat');
+            const occupiedRoomsStat = document.getElementById('occupied-rooms-stat');
+            const noRequestsMsg = document.getElementById('no-requests-msg');
+            const noAllottedMsg = document.getElementById('no-allotted-msg');
+            
+            // View switching elements
+            const sidebarNav = document.getElementById('sidebar-nav');
+            const views = document.querySelectorAll('#dashboard-view, #students-view, #room-management-view');
+            const studentsTableBody = document.getElementById('students-table-body');
+            const noStudentsMsg = document.getElementById('no-students-msg');
+            const mainHeaderTitle = document.getElementById('main-header-title');
+
+            // --- Mobile Sidebar Elements ---
+            const menuToggleBtn = document.getElementById('menu-toggle-btn');
+            const sidebar = document.getElementById('sidebar');
+            const sidebarOverlay = document.getElementById('sidebar-overlay');
+
+            // --- Mock Data ---
+            const TOTAL_ROOMS = 350;
+
+            let pendingRequests = [
+                { id: 1, studentName: 'Rohan Sharma', studentId: '2025-CS-101', requestedType: 'AC Single' },
+                { id: 2, studentName: 'Priya Singh', studentId: '2025-EE-045', requestedType: 'Non-AC Double' },
+                { id: 3, studentName: 'Amit Patel', studentId: '2025-ME-089', requestedType: 'AC Double' },
+                { id: 4, studentName: 'Sneha Verma', studentId: '2025-CS-132', requestedType: 'Non-AC Single' },
+            ];
+
+            let allottedRooms = [
+                { studentName: 'Vikram Rathore', studentId: '2024-CS-012', roomNumber: 'A-101', roomType: 'AC Single' },
+                { studentName: 'Anjali Mehta', studentId: '2024-ME-033', roomNumber: 'B-205', roomType: 'Non-AC Double' },
+            ];
+
+            // --- Core Functions ---
+            function findNextAvailableRoom(roomType) {
+                const blockPrefix = roomType.includes('AC') ? 'A' : 'C';
+                const lastRoomNum = allottedRooms
+                    .filter(r => r.roomNumber.startsWith(blockPrefix))
+                    .map(r => parseInt(r.roomNumber.split('-')[1]))
+                    .reduce((max, num) => Math.max(max, num), 100);
+                return `${blockPrefix}-${lastRoomNum + 1}`;
+            }
+
+            function renderAll() {
+                renderPendingRequests();
+                renderAllottedRooms();
+                renderStudentsTable();
+                updateStats();
+            }
+
+            function updateStats() {
+                const occupiedCount = allottedRooms.length;
+                const pendingCount = pendingRequests.length;
+                availableRoomsStat.textContent = TOTAL_ROOMS - occupiedCount;
+                pendingRequestsStat.textContent = pendingCount;
+                occupiedRoomsStat.textContent = occupiedCount;
+                
+                noRequestsMsg.classList.toggle('hidden', pendingCount > 0);
+                noAllottedMsg.classList.toggle('hidden', occupiedCount > 0);
+                noStudentsMsg.classList.toggle('hidden', occupiedCount > 0);
+                studentsTableBody.parentElement.classList.toggle('hidden', occupiedCount === 0);
+
+            }
+
+            function renderPendingRequests() {
+                bookingRequestsList.innerHTML = '';
+                if (pendingRequests.length === 0) {
+                    bookingRequestsList.appendChild(noRequestsMsg);
+                } else {
+                    pendingRequests.forEach(request => {
+                        const card = document.createElement('div');
+                        card.className = 'request-card bg-slate-50 p-4 rounded-lg border border-slate-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4';
+                        card.innerHTML = `
+                            <div>
+                                <p class="font-bold text-slate-800">${request.studentName}</p>
+                                <p class="text-sm text-slate-500">ID: ${request.studentId}</p>
+                                <p class="text-sm text-slate-600 font-medium mt-1">Wants: <span class="text-indigo-600">${request.requestedType}</span></p>
+                            </div>
+                            <div class="flex-shrink-0 flex gap-2">
+                                <button data-request-id="${request.id}" class="accept-btn bg-green-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-600 transition-colors text-sm">Accept</button>
+                                <button data-request-id="${request.id}" class="decline-btn bg-red-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-red-600 transition-colors text-sm">Decline</button>
+                            </div>
+                        `;
+                        bookingRequestsList.appendChild(card);
+                    });
+                }
+            }
+
+            function renderAllottedRooms() {
+                allottedRoomsList.innerHTML = '';
+                 if (allottedRooms.length === 0) {
+                    allottedRoomsList.appendChild(noAllottedMsg);
+                } else {
+                    allottedRooms.forEach(allotment => {
+                        const card = document.createElement('div');
+                        card.className = 'allotted-card bg-slate-50 p-4 rounded-lg border border-slate-200';
+                        card.innerHTML = `
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="font-bold text-slate-800">${allotment.studentName}</p>
+                                    <p class="text-sm text-slate-500">ID: ${allotment.studentId}</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="font-bold text-blue-600 text-lg">${allotment.roomNumber}</p>
+                                    <p class="text-sm text-slate-500">${allotment.roomType}</p>
+                                </div>
+                            </div>
+                        `;
+                        allottedRoomsList.appendChild(card);
+                    });
+                }
+            }
+            
+            function renderStudentsTable() {
+                studentsTableBody.innerHTML = '';
+                if (allottedRooms.length > 0) {
+                    allottedRooms.forEach(student => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">${student.studentName}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">${student.studentId}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">${student.roomNumber}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">${student.roomType}</td>
+                        `;
+                        studentsTableBody.appendChild(row);
+                    });
+                }
+            }
+            
+            // --- Mobile Sidebar Logic ---
+            function openSidebar() {
+                sidebar.classList.remove('-translate-x-full');
+                sidebarOverlay.classList.remove('hidden');
+            }
+
+            function closeSidebar() {
+                sidebar.classList.add('-translate-x-full');
+                sidebarOverlay.classList.add('hidden');
+            }
+
+            // --- Event Handlers ---
+            menuToggleBtn.addEventListener('click', openSidebar);
+            sidebarOverlay.addEventListener('click', closeSidebar);
+
+            bookingRequestsList.addEventListener('click', function (e) {
+                const target = e.target;
+                const requestId = parseInt(target.dataset.requestId);
+
+                if (target.classList.contains('accept-btn')) {
+                    const requestIndex = pendingRequests.findIndex(r => r.id === requestId);
+                    if (requestIndex === -1) return;
+                    
+                    const request = pendingRequests[requestIndex];
+
+                    const newAllotment = {
+                        studentName: request.studentName,
+                        studentId: request.studentId,
+                        roomNumber: findNextAvailableRoom(request.requestedType),
+                        roomType: request.requestedType
+                    };
+                    allottedRooms.push(newAllotment);
+                    pendingRequests.splice(requestIndex, 1);
+                    renderAll();
+                }
+
+                if (target.classList.contains('decline-btn')) {
+                    pendingRequests = pendingRequests.filter(r => r.id !== requestId);
+                    renderAll();
+                }
+            });
+            
+            sidebarNav.addEventListener('click', function(e) {
+                e.preventDefault();
+                const link = e.target.closest('.sidebar-link');
+                if (!link) return;
+
+                const viewToShow = link.dataset.view;
+                views.forEach(view => view.classList.add('hidden'));
+                document.getElementById(viewToShow).classList.remove('hidden');
+                
+                mainHeaderTitle.textContent = link.textContent.trim();
+
+                sidebarNav.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+
+                 // Close sidebar on navigation in mobile view
+                if (window.innerWidth < 1024) {
+                    closeSidebar();
+                }
+            });
+
+            // --- Initial Load ---
+            renderAll();
+            sidebarNav.querySelector('[data-view="dashboard-view"]').classList.add('active');
+        });
+    </script>
+
+</body>
+</html>

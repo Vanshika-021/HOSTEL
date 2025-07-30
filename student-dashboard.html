@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard - Hostel Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9;
+            /* slate-100 */
+        }
+
+        .sidebar-link.active {
+            background-color: #e2e8f0;
+            /* slate-200 */
+            color: #1e293b;
+            /* slate-800 */
+            font-weight: 600;
+        }
+
+        .status-card,
+        .room-allotment-view {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .room-circle {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: white;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .room-circle:hover:not(.cursor-not-allowed) {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .accordion-arrow {
+            transition: transform 0.3s ease-in-out;
+        }
+    </style>
+</head>
+
+<body class="antialiased text-slate-800">
+
+    <div class="relative min-h-screen lg:flex">
+        <aside id="sidebar"
+            class="fixed inset-y-0 left-0 z-30 w-64 bg-white border-r border-slate-200 flex flex-col transform -translate-x-full lg:relative lg:translate-x-0 lg:flex-shrink-0 transition-transform duration-300 ease-in-out">
+            <div class="h-16 flex items-center justify-center border-b border-slate-200 flex-shrink-0">
+                <h1 class="text-xl font-bold text-slate-800"><i class="fas fa-user-graduate mr-2"></i>Student Portal
+                </h1>
+            </div>
+            <nav id="sidebar-nav" class="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+                <a href="#" data-view="profile-view"
+                    class="sidebar-link flex items-center px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg">
+                    <i class="fas fa-user-circle w-6 h-6 mr-3"></i>
+                    My Profile
+                </a>
+                <a href="#" data-view="book-room-view"
+                    class="sidebar-link flex items-center px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg">
+                    <i class="fas fa-bed w-6 h-6 mr-3"></i>
+                    Book a Room
+                </a>
+                <a href="#" data-view="booking-details-view"
+                    class="sidebar-link flex items-center px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg">
+                    <i class="fas fa-file-alt w-6 h-6 mr-3"></i>
+                    Booking Details
+                </a>
+            </nav>
+            <div class="p-4 border-t border-slate-200">
+                <a href="index.html" class="flex items-center px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg">
+                    <i class="fas fa-sign-out-alt w-6 h-6 mr-3"></i>
+                    Logout
+                </a>
+            </div>
+        </aside>
+
+        <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-20 hidden lg:hidden"></div>
+
+        <main class="flex-1 p-6 md:p-8 overflow-y-auto">
+            <header class="mb-8 flex justify-between items-center">
+                <div>
+                    <h1 id="main-header" class="text-2xl lg:text-3xl font-bold text-slate-900">My Profile</h1>
+                    <p class="text-slate-500 mt-1">Welcome back, Rohan!</p>
+                </div>
+                <button id="menu-toggle-btn"
+                    class="lg:hidden p-2 rounded-md text-slate-600 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500">
+                    <i class="fas fa-bars fa-lg"></i>
+                </button>
+            </header>
+
+            <div id="profile-view">
+                <section class="bg-white p-6 md:p-8 rounded-xl border border-slate-200">
+                    <div
+                        class="flex flex-col items-center text-center md:flex-row md:items-center md:text-left md:space-x-6 space-y-4 md:space-y-0">
+                        <div class="flex-shrink-0">
+                            <div class="h-24 w-24 rounded-full bg-indigo-100 flex items-center justify-center">
+                                <i class="fas fa-user-graduate fa-3x text-indigo-500"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <h2 id="profile-name" class="text-2xl font-bold text-slate-800">Rohan Sharma</h2>
+                            <p id="profile-id" class="text-slate-500">Student ID: 2025-CS-101</p>
+                            <p id="profile-course" class="text-slate-500">Course: B.Tech Computer Science</p>
+                        </div>
+                    </div>
+                    <div class="mt-8 border-t border-slate-200 pt-6">
+                        <h3 class="text-lg font-semibold text-slate-700 mb-4">Contact Information</h3>
+                        <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
+                            <div>
+                                <dt class="text-sm font-medium text-slate-500">Email Address</dt>
+                                <dd id="profile-email" class="mt-1 text-sm text-slate-900">rohan.sharma@university.edu
+                                </dd>
+                            </div>
+                            <div>
+                                <dt class="text-sm font-medium text-slate-500">Phone Number</dt>
+                                <dd id="profile-phone" class="mt-1 text-sm text-slate-900">+91 98765 43210</dd>
+                            </div>
+                        </dl>
+                    </div>
+                </section>
+            </div>
+
+            <div id="book-room-view" class="hidden">
+                <section class="bg-white p-6 md:p-8 rounded-xl border border-slate-200 max-w-2xl mx-auto">
+                    <h2 class="text-xl font-bold text-slate-800 mb-2">Choose Your Hostel</h2>
+                    <p class="text-slate-500 mb-6">Select your hostel type to view available rooms.</p>
+                    <form id="hostel-selection-form">
+                        <div class="space-y-6">
+                            <div>
+                                <label for="hostel-type" class="block text-sm font-medium text-slate-700 mb-2">Select
+                                    Hostel Type</label>
+                                <select id="hostel-type" name="hostel-type"
+                                    class="w-full p-3 border border-slate-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
+                                    <option value="boys">Boys Hostel</option>
+                                    <option value="girls">Girls Hostel</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mt-8 border-t border-slate-200 pt-6">
+                            <button type="submit"
+                                class="w-full bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-indigo-700 transition-colors flex items-center justify-center">
+                                <i class="fas fa-arrow-right mr-2"></i>
+                                View Rooms
+                            </button>
+                        </div>
+                    </form>
+                </section>
+            </div>
+
+            <div id="room-allotment-view" class="hidden">
+                <header class="text-center mb-8">
+                    <h1 class="text-2xl md:text-3xl font-bold text-slate-900">Hostel Allotment Portal</h1>
+                    <p class="text-slate-500 mt-2">Expand a block to view rooms. Click on an available room to book it.
+                    </p>
+                </header>
+                <div class="flex flex-col sm:flex-row justify-center sm:items-end gap-4 mb-8">
+                    <div class="w-full max-w-xs mx-auto sm:mx-0">
+                        <label for="room-type-filter" class="block text-sm font-medium text-slate-700 mb-1">Filter by
+                            Room Type:</label>
+                        <select id="room-type-filter"
+                            class="w-full p-3 border border-slate-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                            <option value="all">Show All Types</option>
+                            <option value="ac-single">AC Single</option>
+                            <option value="ac-double">AC Double</option>
+                            <option value="non-ac-single">Non-AC Single</option>
+                            <option value="non-ac-double">Non-AC Double</option>
+                        </select>
+                    </div>
+                </div>
+                <main id="room-display-area" class="space-y-4 max-w-4xl mx-auto"></main>
+            </div>
+
+            <div id="booking-details-view" class="hidden">
+                <section id="booking-status-container">
+                </section>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // --- DOM Elements ---
+            const sidebarNav = document.getElementById('sidebar-nav');
+            const mainHeader = document.getElementById('main-header');
+            const views = document.querySelectorAll('#profile-view, #book-room-view, #booking-details-view, #room-allotment-view');
+            const hostelSelectionForm = document.getElementById('hostel-selection-form');
+            const bookingStatusContainer = document.getElementById('booking-status-container');
+            const roomDisplayArea = document.getElementById('room-display-area');
+            const roomTypeFilter = document.getElementById('room-type-filter');
+
+            // --- Mobile Sidebar Elements ---
+            const menuToggleBtn = document.getElementById('menu-toggle-btn');
+            const sidebar = document.getElementById('sidebar');
+            const sidebarOverlay = document.getElementById('sidebar-overlay');
+
+            // --- Mock Data ---
+            let studentProfile = {
+                name: 'Rohan Sharma',
+                studentId: '2025-CS-101',
+                course: 'B.Tech Computer Science',
+                email: 'rohan.sharma@university.edu',
+                phone: '+91 98765 43210',
+                booking: null
+            };
+
+            const ROOM_TYPES = ['ac-single', 'ac-double', 'non-ac-single', 'non-ac-double'];
+            const BOYS_HOSTEL_BLOCKS = [
+                { id: 'A', name: 'Aravali' }, { id: 'B', name: 'Vindhya' }, { id: 'C', name: 'Nilgiri' },
+                { id: 'D', name: 'Shivalik' }, { id: 'E', name: 'Himalaya' }
+            ];
+            const GIRLS_HOSTEL_BLOCKS = [
+                { id: 'F', name: 'Ganga' }, { id: 'G', name: 'Yamuna' }, { id: 'H', name: 'Saraswati' },
+                { id: 'I', name: 'Kaveri' }, { id: 'J', name: 'Godavari' }
+            ];
+            const FLOORS_PER_BLOCK = 7;
+            const ROOMS_PER_FLOOR = 10;
+            const ROOM_TYPE_COLORS = {
+                'ac-single': 'bg-blue-500', 'ac-double': 'bg-indigo-500',
+                'non-ac-single': 'bg-amber-500', 'non-ac-double': 'bg-orange-500'
+            };
+            let currentHostelData = [];
+
+            // --- Core Functions ---
+            function renderBookingDetails() {
+                bookingStatusContainer.innerHTML = '';
+                if (!studentProfile.booking) {
+                    bookingStatusContainer.innerHTML = `<div class="status-card text-center bg-white p-8 rounded-xl border border-slate-200"><i class="fas fa-folder-open fa-3x text-slate-400 mb-4"></i><h2 class="text-xl font-bold text-slate-800">No Booking Found</h2><p class="text-slate-500 mt-2">You haven't applied for a room yet. Please go to the "Book a Room" section to start.</p></div>`;
+                } else if (studentProfile.booking === 'pending') {
+                    bookingStatusContainer.innerHTML = `<div class="status-card text-center bg-white p-8 rounded-xl border border-slate-200"><i class="fas fa-hourglass-half fa-3x text-amber-500 mb-4 animate-spin"></i><h2 class="text-xl font-bold text-slate-800">Application Pending</h2><p class="text-slate-500 mt-2">Your application is under review. We will notify you once it's processed.</p></div>`;
+                } else {
+                    bookingStatusContainer.innerHTML = `<div class="status-card bg-white p-6 md:p-8 rounded-xl border border-green-300 shadow-lg"><div class="text-center mb-6"><i class="fas fa-check-circle fa-3x text-green-500 mb-4"></i><h2 class="text-xl md:text-2xl font-bold text-slate-800">Congratulations! Room Allotted!</h2><p class="text-slate-500 mt-1">Welcome to your new home at Hostel Hub.</p></div><div class="mt-6 border-t border-slate-200 pt-6"><dl class="grid grid-cols-1 sm:grid-cols-2 gap-6"><div><dt class="text-sm font-medium text-slate-500">Student Name</dt><dd class="mt-1 text-lg font-semibold text-slate-900">${studentProfile.name}</dd></div><div><dt class="text-sm font-medium text-slate-500">Student ID</dt><dd class="mt-1 text-lg font-semibold text-slate-900">${studentProfile.studentId}</dd></div><div><dt class="text-sm font-medium text-slate-500">Allotted Room</dt><dd class="mt-1 text-xl md:text-2xl font-bold text-indigo-600">${studentProfile.booking.roomNumber}</dd></div><div><dt class="text-sm font-medium text-slate-500">Room Type</dt><dd class="mt-1 text-lg font-semibold text-slate-900">${studentProfile.booking.roomType.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}</dd></div></dl></div></div>`;
+                }
+            }
+
+            function renderProfile() {
+                document.getElementById('profile-name').textContent = studentProfile.name;
+                document.getElementById('profile-id').textContent = `Student ID: ${studentProfile.studentId}`;
+                document.getElementById('profile-course').textContent = `Course: ${studentProfile.course}`;
+                document.getElementById('profile-email').textContent = studentProfile.email;
+                document.getElementById('profile-phone').textContent = studentProfile.phone;
+            }
+
+            function generateHostelData(blocks) {
+                const data = [];
+                blocks.forEach(blockInfo => {
+                    const block = { id: blockInfo.id, name: `Block ${blockInfo.id}: ${blockInfo.name}`, floors: [] };
+                    for (let i = 1; i <= FLOORS_PER_BLOCK; i++) {
+                        const floor = { name: `Floor ${i}`, rooms: [] };
+                        for (let j = 1; j <= ROOMS_PER_FLOOR; j++) {
+                            const roomNumber = i * 100 + j;
+                            floor.rooms.push({
+                                number: `${blockInfo.id}-${roomNumber}`,
+                                type: ROOM_TYPES[roomNumber % ROOM_TYPES.length],
+                                isOccupied: (i + j) % 5 === 0
+                            });
+                        }
+                        block.floors.push(floor);
+                    }
+                    data.push(block);
+                });
+                return data;
+            }
+
+            function renderRoomSelectionView() {
+                roomDisplayArea.innerHTML = '';
+                const selectedType = roomTypeFilter.value;
+
+                currentHostelData.forEach(block => {
+                    const accordionItem = document.createElement('div');
+                    accordionItem.className = 'bg-white rounded-lg shadow-md overflow-hidden';
+                    const accordionHeader = document.createElement('button');
+                    accordionHeader.className = 'w-full flex justify-between items-center p-4 md:p-5 text-left font-bold text-lg md:text-xl text-slate-800 hover:bg-slate-50 transition';
+                    accordionHeader.innerHTML = `<span>${block.name}</span><svg class="accordion-arrow w-6 h-6 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>`;
+                    const accordionContent = document.createElement('div');
+                    accordionContent.className = 'p-4 md:p-5 border-t border-slate-200 hidden space-y-6';
+
+                    block.floors.forEach(floor => {
+                        const floorElement = document.createElement('div');
+                        floorElement.innerHTML = `<h4 class="text-md font-semibold mb-3 text-slate-600">${floor.name}</h4>`;
+                        const roomsGrid = document.createElement('div');
+                        roomsGrid.className = 'grid grid-cols-5 sm:grid-cols-10 gap-3';
+                        floor.rooms.forEach(room => {
+                            const roomCircle = document.createElement('div');
+                            roomCircle.className = 'room-circle';
+                            roomCircle.textContent = room.number.split('-')[1];
+                            roomCircle.dataset.roomNumber = room.number;
+                            roomCircle.dataset.roomType = room.type;
+                            const roomTypeDisplay = room.type.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase());
+                            if (room.isOccupied) {
+                                roomCircle.classList.add('bg-slate-400', 'cursor-not-allowed');
+                                roomCircle.title = `Room ${room.number} (Occupied)`;
+                                roomCircle.dataset.available = "false";
+                            } else {
+                                roomCircle.classList.add(ROOM_TYPE_COLORS[room.type]);
+                                roomCircle.title = `Room ${room.number} (${roomTypeDisplay}) - Available`;
+                                roomCircle.dataset.available = "true";
+                                if (selectedType !== 'all' && room.type !== selectedType) {
+                                    roomCircle.classList.add('opacity-30');
+                                }
+                            }
+                            roomsGrid.appendChild(roomCircle);
+                        });
+                        floorElement.appendChild(roomsGrid);
+                        accordionContent.appendChild(floorElement);
+                    });
+
+                    accordionHeader.addEventListener('click', () => {
+                        accordionContent.classList.toggle('hidden');
+                        accordionHeader.querySelector('.accordion-arrow').classList.toggle('rotate-180');
+                    });
+                    accordionItem.appendChild(accordionHeader);
+                    accordionItem.appendChild(accordionContent);
+                    roomDisplayArea.appendChild(accordionItem);
+                });
+            }
+
+            // --- Mobile Sidebar Logic ---
+            function openSidebar() {
+                sidebar.classList.remove('-translate-x-full');
+                sidebarOverlay.classList.remove('hidden');
+            }
+
+            function closeSidebar() {
+                sidebar.classList.add('-translate-x-full');
+                sidebarOverlay.classList.add('hidden');
+            }
+
+            // --- Event Handlers ---
+            menuToggleBtn.addEventListener('click', openSidebar);
+            sidebarOverlay.addEventListener('click', closeSidebar);
+
+            sidebarNav.addEventListener('click', function (e) {
+                e.preventDefault();
+                const link = e.target.closest('.sidebar-link');
+                if (!link) return;
+
+                const viewToShow = link.dataset.view;
+                views.forEach(view => view.classList.add('hidden'));
+                document.getElementById(viewToShow).classList.remove('hidden');
+                mainHeader.textContent = link.textContent.trim();
+                sidebarNav.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+
+                if (viewToShow === 'booking-details-view') {
+                    renderBookingDetails();
+                }
+
+                // Close sidebar on navigation in mobile view
+                if (window.innerWidth < 1024) {
+                    closeSidebar();
+                }
+            });
+
+            hostelSelectionForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+                if (studentProfile.booking) {
+                    alert('You already have an active or pending booking.');
+                    sidebarNav.querySelector('[data-view="booking-details-view"]').click();
+                    return;
+                }
+                const hostelType = document.getElementById('hostel-type').value;
+                const blocks = (hostelType === 'boys') ? BOYS_HOSTEL_BLOCKS : GIRLS_HOSTEL_BLOCKS;
+                currentHostelData = generateHostelData(blocks);
+
+                views.forEach(view => view.classList.add('hidden'));
+                document.getElementById('room-allotment-view').classList.remove('hidden');
+                mainHeader.textContent = "Room Selection";
+                renderRoomSelectionView();
+            });
+
+            roomTypeFilter.addEventListener('change', renderRoomSelectionView);
+
+            roomDisplayArea.addEventListener('click', function (e) {
+                const roomCircle = e.target.closest('.room-circle');
+                if (roomCircle && roomCircle.dataset.available === "true" && !roomCircle.classList.contains('opacity-30')) {
+                    const roomTypeDisplay = roomCircle.dataset.roomType.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase());
+                    if (confirm(`Book Room ${roomCircle.dataset.roomNumber} (${roomTypeDisplay})?\n\nThis action cannot be undone.`)) {
+                        studentProfile.booking = {
+                            roomNumber: roomCircle.dataset.roomNumber,
+                            roomType: roomCircle.dataset.roomType
+                        };
+                        alert('Room booked successfully!');
+                        sidebarNav.querySelector('[data-view="booking-details-view"]').click();
+                    }
+                }
+            });
+
+            // --- Initial Load ---
+            renderProfile();
+            sidebarNav.querySelector('[data-view="profile-view"]').classList.add('active');
+            document.getElementById('profile-view').classList.remove('hidden');
+        });
+    </script>
+
+</body>
+
+</html>
